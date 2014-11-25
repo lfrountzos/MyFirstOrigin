@@ -38,7 +38,7 @@ public class DocUI extends UI {
 	DocEditor docView = new DocEditor();
 	
 	List<IrregularVerb> lst = new IrregularVerbImpl().getIrregularVerb();
-	Table iregList = new Table(this.getContainer(lst));
+	Table iregList = new Table("Irregular", this.getContainer(lst));
 	
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = DocUI.class)
@@ -56,7 +56,8 @@ public class DocUI extends UI {
 		vSplit.addComponent(docView);
 		
 		docList.setSizeFull();
-
+		iregList.setSizeFull();
+		
 		docList.addValueChangeListener(new ValueChangeListener() {
 			public void valueChange(ValueChangeEvent event) {
 				docView.setPropertyDataSource(new TextFileProperty((File) event.getProperty().getValue()));
@@ -65,30 +66,25 @@ public class DocUI extends UI {
 		});
 		docList.setImmediate(true);
 		docList.setSelectable(true);
+		iregList.setImmediate(true);
+		iregList.setSelectable(true);
 	}
-	Container getContainer(List<Class<?>> lst) { 
+	private Container getContainer(List<IrregularVerb> lst) { 
+		String PROPERTY1 = "Present";
+		String PROPERTY2 = "Past Simple";
+		String PROPERTY3 = "Past Participle"; 
 		final IndexedContainer cont = new IndexedContainer(); 
 
 		cont.addContainerProperty(PROPERTY1, String.class, null); 
 		cont.addContainerProperty(PROPERTY2, String.class, null); 
-		cont.addContainerProperty(CUSTOM, CssLayout.class, null); 
+		cont.addContainerProperty(PROPERTY3, String.class, null); 
 
-		for (Class<?> class1 : lst) {
-			
+		for (IrregularVerb irVerb : lst) {
+			Item added = cont.addItem(irVerb.getRowId());
+			added.getItemProperty(PROPERTY1).setValue(irVerb.getBaseForm());
+			added.getItemProperty(PROPERTY2).setValue(irVerb.getPastSimple());
+			added.getItemProperty(PROPERTY3).setValue(irVerb.getPastParticiple());
 		}
-		for (final List<Class<?>> e : lst) { 
-		final Item added = cont.addItem(e.getKey().getId()); 
-		added.getItemProperty(PROPERTY1).setValue(e.getKey().getProperty1()); 
-		added.getItemProperty(PROPERTY2).setValue(e.getKey().getProperty2()); 
-		final CssLayout l = new CssLayout(); 
-		if (e.getValue() == Boolean.class) { 
-			l.addComponent(new CheckBox("My Check Box of Item id: " + e.getKey().getId())); 
-		} else { 
-			l.addComponent(new TextField("Textbox for id: " + e.getKey().getId())); 
-		} 
-		added.getItemProperty(CUSTOM).setValue(l); 
-		} 
-
 		return cont; 
 	} 
 }
